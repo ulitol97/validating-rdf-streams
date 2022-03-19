@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Check submodule updates and open PRs
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "submodules"

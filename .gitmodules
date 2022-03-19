@@ -1,0 +1,12 @@
+[submodule "rdfshape-api"]
+	path = rdfshape-api
+	url = git@github.com:weso/rdfshape-api.git
+[submodule "rdfshape-client"]
+	path = rdfshape-client
+	url = git@github.com:weso/rdfshape-client.git
+[submodule "kafka-producer-demo"]
+	path = kafka-producer-demo
+	url = git@github.com:ulitol97/kafka-producer-demo.git
+[submodule "comet"]
+	path = comet
+	url = git@github.com:ulitol97/comet.git
