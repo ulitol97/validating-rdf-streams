@@ -1,0 +1,71 @@
+# https://github.com/weso/rdfshape
+version: "3"
+services:
+
+  # API on 8080
+  # https://github.com/weso/rdfshape-api
+  rdfshape-api:
+    image: ghcr.io/weso/rdfshape-api:stable
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: curl -s -f --retry 4 --max-time 4 --retry-delay 6 rdfshape-api:8080/api/health
+      interval: 1m
+      timeout: 1m
+      start_period: 20s
+      retries: 2
+    restart: unless-stopped
+
+  # Main client on 80
+  # https://github.com/weso/rdfshape-client
+  rdfshape-client:
+    image: ghcr.io/weso/rdfshape-client:stable
+    ports:
+      - "80:80"
+    depends_on:
+      - rdfshape-api
+    healthcheck:
+      test: curl -s -f --retry 4 --max-time 4 --retry-delay 6 rdfshape-client
+      interval: 1m
+      timeout: 1m
+      start_period: 15s
+      retries: 2
+    restart: unless-stopped
+    environment:
+      - RDFSHAPE_HOST=http://localhost:8080 # used for the app in requests to the backend
+      - RDFSHAPE_WS_HOST=ws://localhost:8080 # reference WS server
+    labels:
+      - autoheal=true
+
+  # Secondary client on 81
+  # https://github.com/weso/wikishape
+  wikishape:
+    image: ghcr.io/weso/wikishape:stable
+    ports:
+      - "81:80"
+    depends_on:
+      - rdfshape-api
+    healthcheck:
+      test: curl -s -f --retry 4 --max-time 4 --retry-delay 6 wikishape
+      interval: 1m
+      timeout: 1m
+      start_period: 15s
+      retries: 2
+    restart: unless-stopped
+    environment:
+      - RDFSHAPE_HOST=http://localhost:8080 # reference HTTP server
+      - RDFSHAPE_WS_HOST=ws://localhost:8080 # reference WS server
+
+  # Kafka producer
+  # https://github.com/ulitol97/kafka-producer-demo
+  kafka-producer:
+    image: ulitol97/kafka-producer:dev
+    ports:
+      - "2181:2181" # Zookeeper
+      - "9092:9092" # Kafka
+    depends_on:
+      - rdfshape-api
+    environment:
+      - ADVERTISED_HOST=kafka-producer # external hostname for the container
+      - TOPIC_NAME=rdf # post to this topic
+      - TIME_BETWEEN_MESSAGES=2000 # post every n millis
