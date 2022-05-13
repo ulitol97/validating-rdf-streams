@@ -15,6 +15,9 @@ services:
       start_period: 20s
       retries: 2
     restart: unless-stopped
+    environment:
+      - PORT=8080 # Choose port
+      - STREAM_TIMEOUT=60 # Streaming validations timeout (seconds)
 
   # Main client on 80
   # https://github.com/weso/rdfshape-client
