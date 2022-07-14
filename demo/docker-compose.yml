@@ -40,25 +40,6 @@ services:
     labels:
       - autoheal=true
 
-  # Secondary client on 81
-  # https://github.com/weso/wikishape
-  wikishape:
-    image: ghcr.io/weso/wikishape:stable
-    ports:
-      - "81:80"
-    depends_on:
-      - rdfshape-api
-    healthcheck:
-      test: curl -s -f --retry 4 --max-time 4 --retry-delay 6 wikishape
-      interval: 1m
-      timeout: 1m
-      start_period: 15s
-      retries: 2
-    restart: unless-stopped
-    environment:
-      - RDFSHAPE_HOST=http://localhost:8080 # reference HTTP server
-      - RDFSHAPE_WS_HOST=ws://localhost:8080 # reference WS server
-
   # Kafka producer
   # https://github.com/ulitol97/kafka-producer-demo
   kafka-producer:
